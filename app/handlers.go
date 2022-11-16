@@ -5,6 +5,8 @@ import (
 	"encoding/xml"
 	"fmt"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 type Customer struct {
@@ -26,8 +28,17 @@ func getAllCustomers(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("Content-Type") == "application/xml" {
 		w.Header().Add("content-type", "application/xml")
 		xml.NewEncoder(w).Encode(customers)
+	} else {
+		w.Header().Add("content-type", "application/json")
+		json.NewEncoder(w).Encode(customers)
 	}
+}
 
-	w.Header().Add("content-type", "application/json")
-	json.NewEncoder(w).Encode(customers)
+func createCustomer(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Posted!")
+}
+
+func getCustomer(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	fmt.Fprint(w, vars["customer_id"])
 }
