@@ -4,16 +4,17 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/bradrogan/banking/domain"
+	"github.com/bradrogan/banking/service"
 	"github.com/gorilla/mux"
 )
 
 func Start() {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/greet", greet).Methods(http.MethodGet)
-	router.HandleFunc("/customers", getAllCustomers).Methods(http.MethodGet)
-	router.HandleFunc("/customers", createCustomer).Methods(http.MethodPost)
-	router.HandleFunc("/customers/{customer_id:[0-9]*}", getCustomer).Methods(http.MethodGet)
+	ch := CustomerHandlers{service.NewCustomerService(domain.NewCustomerRepositoryStub())}
+
+	router.HandleFunc("/customers", ch.getAllCustomers).Methods(http.MethodGet)
 
 	log.Fatal(http.ListenAndServe("localhost:8000", router))
 }
