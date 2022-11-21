@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bradrogan/banking/service"
+	"github.com/bradrogan/banking/domain"
+	"github.com/bradrogan/banking/errs"
 	"github.com/gorilla/mux"
 )
 
@@ -16,8 +17,12 @@ type Customer struct {
 	Zipcode string `json:"zip_code" xml:"zipcode"`
 }
 
+type CustomerServicer interface {
+	GetAllCustomers() ([]domain.Customer, error)
+	GetCustomer(id string) (*domain.Customer, *errs.AppError)
+}
 type CustomerHandlers struct {
-	service service.CustomerService
+	service CustomerServicer
 }
 
 func (ch *CustomerHandlers) getAllCustomers(w http.ResponseWriter, r *http.Request) {
