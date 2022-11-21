@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/bradrogan/banking/errs"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -51,7 +52,7 @@ func NewCustomerRepositoryDb() customerRepositoryDb {
 	return customerRepositoryDb{client: client}
 }
 
-func (d customerRepositoryDb) ById(id string) (*Customer, error) {
+func (d customerRepositoryDb) ById(id string) (*Customer, *errs.AppError) {
 	customerSql := "select customer_id, name, city, zipcode, date_of_birth, status from customers where customer_id = ?"
 
 	row := d.client.QueryRow(customerSql, id)
@@ -60,8 +61,11 @@ func (d customerRepositoryDb) ById(id string) (*Customer, error) {
 
 	err := row.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateofBirth, &c.Status)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errs.NewNotFoundError("Customer not found")
+		}
 		log.Println("Error while scanning customer table " + err.Error())
-		return nil, err
+		return nil, errs.NewUnexpectedError("unexpected database error")
 	}
 	return &c, nil
 }
