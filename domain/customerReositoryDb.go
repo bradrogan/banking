@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type customerRepositoryDb struct {
@@ -37,7 +39,7 @@ func (d customerRepositoryDb) FindAll() ([]Customer, error) {
 }
 
 func NewCustomerRepositoryDb() customerRepositoryDb {
-	client, err := sql.Open("mysql", "root@localhost:3306banking")
+	client, err := sql.Open("mysql", "root@tcp(localhost:3306)/banking")
 	if err != nil {
 		panic(err)
 	}
@@ -47,4 +49,19 @@ func NewCustomerRepositoryDb() customerRepositoryDb {
 	client.SetMaxIdleConns(10)
 
 	return customerRepositoryDb{client: client}
+}
+
+func (d customerRepositoryDb) ById(id string) (*Customer, error) {
+	customerSql := "select customer_id, name, city, zipcode, date_of_birth, status from customers where customer_id = ?"
+
+	row := d.client.QueryRow(customerSql, id)
+
+	var c Customer
+
+	err := row.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateofBirth, &c.Status)
+	if err != nil {
+		log.Println("Error while scanning customer table " + err.Error())
+		return nil, err
+	}
+	return &c, nil
 }
