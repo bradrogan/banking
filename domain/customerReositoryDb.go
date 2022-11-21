@@ -28,7 +28,7 @@ func (d customerRepositoryDb) FindAll() ([]Customer, error) {
 
 	for rows.Next() {
 		var c Customer
-		err = rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateofBirth, &c.Status)
+		err = rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.Status)
 		if err != nil {
 			log.Println("Error while scanning customers " + err.Error())
 			return nil, err
@@ -59,7 +59,7 @@ func (d customerRepositoryDb) ById(id string) (*Customer, *errs.AppError) {
 
 	var c Customer
 
-	err := row.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateofBirth, &c.Status)
+	err := row.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.Status)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errs.NewNotFoundError("Customer not found")
