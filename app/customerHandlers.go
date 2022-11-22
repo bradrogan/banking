@@ -2,8 +2,6 @@ package app
 
 import (
 	"encoding/json"
-	"encoding/xml"
-	"fmt"
 	"net/http"
 
 	"github.com/bradrogan/banking/domain"
@@ -12,7 +10,7 @@ import (
 )
 
 type CustomerServicer interface {
-	GetAllCustomers() ([]domain.Customer, error)
+	GetAllCustomers(domain.CustomerStatus) ([]domain.Customer, *errs.AppError)
 	GetCustomer(id string) (*domain.Customer, *errs.AppError)
 }
 type CustomerHandlers struct {
@@ -20,19 +18,13 @@ type CustomerHandlers struct {
 }
 
 func (ch *CustomerHandlers) getAllCustomers(w http.ResponseWriter, r *http.Request) {
-	customers, err := ch.service.GetAllCustomers()
+	customers, err := ch.service.GetAllCustomers(domain.CustomerStatusActive)
 
 	if err != nil {
-		fmt.Fprint(w, "internal server error")
-		w.WriteHeader(http.StatusInternalServerError)
+		writeResponse(w, err.Code, err.AsMessage())
+		return
 	}
-	if r.Header.Get("Content-Type") == "application/xml" {
-		w.Header().Add("content-type", "application/xml")
-		xml.NewEncoder(w).Encode(customers)
-	} else {
-		w.Header().Add("content-type", "application/json")
-		json.NewEncoder(w).Encode(customers)
-	}
+	writeResponse(w, http.StatusOK, customers)
 }
 
 func (ch *CustomerHandlers) getCustomer(w http.ResponseWriter, r *http.Request) {
@@ -42,10 +34,17 @@ func (ch *CustomerHandlers) getCustomer(w http.ResponseWriter, r *http.Request) 
 	customer, err := ch.service.GetCustomer(id)
 
 	if err != nil {
-		w.WriteHeader(err.Code)
-		fmt.Fprint(w, err.Message)
-	} else {
-		w.Header().Add("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(customer)
+		writeResponse(w, err.Code, err.AsMessage())
+		return
 	}
+	writeResponse(w, http.StatusOK, customer)
+}
+
+func writeResponse(w http.ResponseWriter, code int, data interface{}) {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(code)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		panic(err)
+	}
+
 }

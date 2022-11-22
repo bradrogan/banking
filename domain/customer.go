@@ -11,7 +11,15 @@ type Customer struct {
 	Status      string `json:"status,omitempty" xml:"status"`
 }
 
+type CustomerStatus uint
+
+const (
+	CustomerStatusAll = iota
+	CustomerStatusActive
+	CustomerStatusInactive
+)
+
 type CustomerRepository interface {
-	FindAll() ([]Customer, error)
+	FindAll(CustomerStatus) ([]Customer, *errs.AppError)
 	ById(string) (*Customer, *errs.AppError)
 }

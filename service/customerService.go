@@ -9,8 +9,8 @@ type CustomerService struct {
 	repo domain.CustomerRepository
 }
 
-func (s CustomerService) GetAllCustomers() ([]domain.Customer, error) {
-	return s.repo.FindAll()
+func (s CustomerService) GetAllCustomers(status domain.CustomerStatus) ([]domain.Customer, *errs.AppError) {
+	return s.repo.FindAll(status)
 }
 
 func (s CustomerService) GetCustomer(id string) (*domain.Customer, *errs.AppError) {
