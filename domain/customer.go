@@ -14,12 +14,13 @@ type Customer struct {
 type CustomerStatus uint
 
 const (
-	CustomerStatusAll = iota
+	CustomerStatusAll CustomerStatus = iota
 	CustomerStatusActive
 	CustomerStatusInactive
 )
 
 type CustomerRepository interface {
-	FindAll(CustomerStatus) ([]Customer, *errs.AppError)
+	FindAll() ([]Customer, *errs.AppError)
 	ById(string) (*Customer, *errs.AppError)
+	ByActive(CustomerStatus) ([]Customer, *errs.AppError)
 }

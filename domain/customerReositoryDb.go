@@ -18,18 +18,30 @@ const (
 	DbCustomerInactive = "0"
 )
 
-func (d customerRepositoryDb) FindAll(status CustomerStatus) ([]Customer, *errs.AppError) {
-
-	var findAllSql string
+func (d customerRepositoryDb) ByActive(status CustomerStatus) ([]Customer, *errs.AppError) {
+	byActiveSql := "select customer_id, name, city, zipcode, date_of_birth, status from customers where status = ?"
+	var byActiveQueryParam string
 
 	switch status {
 	case CustomerStatusActive:
-		findAllSql = "select customer_id, name, city, zipcode, date_of_birth, status from customers where status = " + DbCustomerActive
+		byActiveQueryParam = DbCustomerActive
 	case CustomerStatusInactive:
-		findAllSql = "select customer_id, name, city, zipcode, date_of_birth, status from customers where status = " + DbCustomerInactive
-	case CustomerStatusAll:
-		findAllSql = "select customer_id, name, city, zipcode, date_of_birth, status from customers"
+		byActiveQueryParam = DbCustomerInactive
 	}
+
+	rows, err := d.client.Query(byActiveSql, byActiveQueryParam)
+
+	if err != nil {
+		log.Println("Error while querying customer table " + err.Error())
+		return nil, errs.NewUnexpectedError("unexpected database error: " + err.Error())
+	}
+
+	return parseCustomerResults(rows)
+}
+
+func (d customerRepositoryDb) FindAll() ([]Customer, *errs.AppError) {
+
+	findAllSql := "select customer_id, name, city, zipcode, date_of_birth, status from customers"
 
 	rows, err := d.client.Query(findAllSql)
 
@@ -38,11 +50,15 @@ func (d customerRepositoryDb) FindAll(status CustomerStatus) ([]Customer, *errs.
 		return nil, errs.NewUnexpectedError("unexpected database error: " + err.Error())
 	}
 
+	return parseCustomerResults(rows)
+}
+
+func parseCustomerResults(rows *sql.Rows) ([]Customer, *errs.AppError) {
 	customers := make([]Customer, 0)
 
 	for rows.Next() {
 		var c Customer
-		err = rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.Status)
+		err := rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.Status)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				return nil, errs.NewNotFoundError("no customers found: " + err.Error())
@@ -53,7 +69,6 @@ func (d customerRepositoryDb) FindAll(status CustomerStatus) ([]Customer, *errs.
 		customers = append(customers, c)
 	}
 	return customers, nil
-
 }
 
 func NewCustomerRepositoryDb() customerRepositoryDb {
