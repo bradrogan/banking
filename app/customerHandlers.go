@@ -5,14 +5,15 @@ import (
 	"net/http"
 
 	"github.com/bradrogan/banking/domain"
+	"github.com/bradrogan/banking/dto"
 	"github.com/bradrogan/banking/errs"
 	"github.com/gorilla/mux"
 )
 
 type CustomerServicer interface {
-	GetAllCustomers() ([]domain.Customer, *errs.AppError)
-	GetCustomersByStatus(domain.CustomerStatus) ([]domain.Customer, *errs.AppError)
-	GetCustomer(id string) (*domain.Customer, *errs.AppError)
+	GetAllCustomers() ([]dto.CustomerResponse, *errs.AppError)
+	GetCustomersByStatus(domain.CustomerStatus) ([]dto.CustomerResponse, *errs.AppError)
+	GetCustomer(id string) (*dto.CustomerResponse, *errs.AppError)
 }
 type CustomerHandlers struct {
 	service CustomerServicer
@@ -34,9 +35,9 @@ func (ch *CustomerHandlers) getCustomersByStatus(w http.ResponseWriter, r *http.
 	var status domain.CustomerStatus
 
 	switch activeParam {
-	case "active":
+	case domain.CustomerStatusActive.StatusAsText():
 		status = domain.CustomerStatusActive
-	case "inactive":
+	case domain.CustomerStatusInactive.StatusAsText():
 		status = domain.CustomerStatusInactive
 	default:
 		writeResponse(w, http.StatusBadRequest, "invalid value for 'status' query parameter")

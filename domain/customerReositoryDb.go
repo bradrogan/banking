@@ -15,13 +15,13 @@ type customerRepositoryDb struct {
 }
 
 const (
-	DbCustomerActive   = "1"
-	DbCustomerInactive = "0"
+	DbCustomerActive   = 1
+	DbCustomerInactive = 0
 )
 
 func (d customerRepositoryDb) ByActive(status CustomerStatus) ([]Customer, *errs.AppError) {
 	byActiveSql := "select customer_id, name, city, zipcode, date_of_birth, status from customers where status = ?"
-	var byActiveQueryParam string
+	var byActiveQueryParam uint
 
 	customers := make([]Customer, 0)
 

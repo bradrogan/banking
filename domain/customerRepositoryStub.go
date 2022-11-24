@@ -16,7 +16,7 @@ func NewCustomerRepositoryStub() CustomerRepositoryStub {
 			City:        "Edmonton",
 			Zipcode:     "90210",
 			DateOfBirth: "Jan 2, 1972",
-			Status:      "1",
+			Status:      1,
 		},
 		{
 			Id:          "1002",
@@ -24,7 +24,7 @@ func NewCustomerRepositoryStub() CustomerRepositoryStub {
 			City:        "Calgary",
 			Zipcode:     "78910",
 			DateOfBirth: "Jun 4, 1988",
-			Status:      "1",
+			Status:      1,
 		},
 	}
 	return CustomerRepositoryStub{customers: customers}
