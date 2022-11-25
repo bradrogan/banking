@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/bradrogan/banking/config"
 	"github.com/bradrogan/banking/errs"
 	"github.com/bradrogan/banking/logger"
 	_ "github.com/go-sql-driver/mysql"
@@ -74,7 +75,15 @@ func (d customerRepositoryDb) ById(id string) (*Customer, *errs.AppError) {
 }
 
 func NewCustomerRepositoryDb() customerRepositoryDb {
-	client, err := sqlx.Open("mysql", "root@tcp(localhost:3306)/banking")
+	dataSource := config.Db.Database.User +
+		"@tcp(" +
+		config.Db.Database.Host +
+		":" +
+		config.Db.Database.Port +
+		")/" +
+		config.Db.Database.DatabaseName
+
+	client, err := sqlx.Open(config.Db.Database.Driver, dataSource)
 	if err != nil {
 		panic(err)
 	}
