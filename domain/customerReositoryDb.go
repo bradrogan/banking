@@ -75,15 +75,15 @@ func (d customerRepositoryDb) ById(id string) (*Customer, *errs.AppError) {
 }
 
 func NewCustomerRepositoryDb() customerRepositoryDb {
-	dataSource := config.Db.Database.User +
+	dataSource := config.Db.Main.User +
 		"@tcp(" +
-		config.Db.Database.Host +
+		config.Db.Main.Host +
 		":" +
-		config.Db.Database.Port +
+		config.Db.Main.Port +
 		")/" +
-		config.Db.Database.DatabaseName
+		config.Db.Main.DatabaseName
 
-	client, err := sqlx.Open(config.Db.Database.Driver, dataSource)
+	client, err := sqlx.Open(config.Db.Main.Driver, dataSource)
 	if err != nil {
 		panic(err)
 	}

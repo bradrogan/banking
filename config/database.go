@@ -6,7 +6,7 @@ import (
 )
 
 var Db *dbConfig = &dbConfig{
-	Database: database{
+	Main: database{
 		Driver:       "mysql",
 		User:         "root",
 		Host:         "localhost",
@@ -24,7 +24,7 @@ type database struct {
 }
 
 type dbConfig struct {
-	Database database
+	Main database
 }
 
 func (db *dbConfig) ConfigInit() error {
