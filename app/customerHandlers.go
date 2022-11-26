@@ -1,7 +1,6 @@
 package app
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/bradrogan/banking/domain"
@@ -66,13 +65,4 @@ func (ch *CustomerHandlers) getCustomer(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	writeResponse(w, http.StatusOK, customer)
-}
-
-func writeResponse(w http.ResponseWriter, code int, data any) {
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(code)
-	if err := json.NewEncoder(w).Encode(data); err != nil {
-		panic(err)
-	}
-
 }

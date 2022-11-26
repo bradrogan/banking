@@ -19,11 +19,11 @@ type CustomerStatus uint
 const (
 	CustomerStatusInactive CustomerStatus = iota
 	CustomerStatusActive
-	end
+	endCustomerStatus
 )
 
-func (c CustomerStatus) IsValid(value uint) bool {
-	return value < uint(end)
+func (cs CustomerStatus) IsValid() bool {
+	return cs < endCustomerStatus
 }
 
 func (status CustomerStatus) StatusAsText() string {

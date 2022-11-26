@@ -2,13 +2,12 @@ package domain
 
 import (
 	"database/sql"
-	"time"
 
-	"github.com/bradrogan/banking/config"
 	"github.com/bradrogan/banking/errs"
 	"github.com/bradrogan/banking/logger"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+	"go.uber.org/zap"
 )
 
 type customerRepositoryDb struct {
@@ -23,6 +22,11 @@ const (
 func (d customerRepositoryDb) ByActive(status CustomerStatus) ([]Customer, *errs.AppError) {
 	byActiveSql := "select customer_id, name, city, zipcode, date_of_birth, status from customers where status = ?"
 	var byActiveQueryParam uint
+
+	if ok := status.IsValid(); !ok {
+		logger.Error("invalid customer status enum value: ", zap.Uint("customer_status", uint(status)))
+		return nil, errs.NewUnexpectedError("invalid customer status value")
+	}
 
 	customers := make([]Customer, 0)
 
@@ -74,23 +78,6 @@ func (d customerRepositoryDb) ById(id string) (*Customer, *errs.AppError) {
 	return &c, nil
 }
 
-func NewCustomerRepositoryDb() customerRepositoryDb {
-	dataSource := config.Db.Main.User +
-		"@tcp(" +
-		config.Db.Main.Host +
-		":" +
-		config.Db.Main.Port +
-		")/" +
-		config.Db.Main.DatabaseName
-
-	client, err := sqlx.Open(config.Db.Main.Driver, dataSource)
-	if err != nil {
-		panic(err)
-	}
-	// See "Important settings" section.
-	client.SetConnMaxLifetime(time.Minute * 3)
-	client.SetMaxOpenConns(10)
-	client.SetMaxIdleConns(10)
-
-	return customerRepositoryDb{client: client}
+func NewCustomerRepositoryDb(db *sqlx.DB) customerRepositoryDb {
+	return customerRepositoryDb{client: db}
 }

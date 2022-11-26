@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+
 	"github.com/bradrogan/banking/logger"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
@@ -12,7 +14,7 @@ var ConfigDriver *viper.Viper
 // Add config types here so they are loaded on config init
 var config = [...]configInitter{
 	App,
-	Db,
+	Connections,
 }
 
 type configInitter interface {
@@ -46,6 +48,7 @@ func configChange(e fsnotify.Event) {
 func loadConfiguration() error {
 
 	for _, val := range config {
+		logger.Info("loading config", zap.String("type", fmt.Sprintf("%T", val)))
 		if err := val.ConfigInit(); err != nil {
 			return err
 		}

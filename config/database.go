@@ -5,13 +5,13 @@ import (
 	"go.uber.org/zap"
 )
 
-var Db *dbConfig = &dbConfig{
-	Main: database{
+var Connections *dbConfig = &dbConfig{
+	Database: database{
 		Driver:       "mysql",
 		User:         "root",
-		Host:         "localhost",
+		Host:         "localhost1",
 		Port:         "3306",
-		DatabaseName: "default",
+		DatabaseName: "banking",
 	},
 }
 
@@ -24,7 +24,7 @@ type database struct {
 }
 
 type dbConfig struct {
-	Main database
+	Database database
 }
 
 func (db *dbConfig) ConfigInit() error {

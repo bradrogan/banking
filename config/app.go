@@ -7,7 +7,7 @@ import (
 
 var App *appConfig = &appConfig{
 	Server: server{
-		Host: "localhost",
+		Host: "localhost1",
 		Port: "8000",
 	},
 }
