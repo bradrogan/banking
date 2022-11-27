@@ -25,14 +25,12 @@ func (ah *AccountHandlers) NewAccount(w http.ResponseWriter, r *http.Request) {
 	request.CustomerId = id
 
 	err := readRequest(r, &request)
-
 	if err != nil {
 		writeResponse(w, err.Code, err.AsMessage())
 		return
 	}
 
 	response, err := ah.service.NewAccount(request)
-
 	if err != nil {
 		writeResponse(w, err.Code, err.AsMessage())
 		return
