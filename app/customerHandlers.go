@@ -34,10 +34,10 @@ func (ch *CustomerHandlers) getCustomersByStatus(w http.ResponseWriter, r *http.
 	var status domain.CustomerStatus
 
 	switch activeParam {
-	case domain.CustomerStatusActive.StatusAsText():
-		status = domain.CustomerStatusActive
-	case domain.CustomerStatusInactive.StatusAsText():
-		status = domain.CustomerStatusInactive
+	case domain.CustomerActive.StatusAsText():
+		status = domain.CustomerActive
+	case domain.CustomerInactive.StatusAsText():
+		status = domain.CustomerInactive
 	default:
 		writeResponse(w, http.StatusBadRequest, "invalid value for 'status' query parameter")
 		return

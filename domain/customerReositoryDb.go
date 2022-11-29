@@ -14,14 +14,8 @@ type customerRepositoryDb struct {
 	client *sqlx.DB
 }
 
-const (
-	DbCustomerActive   = 1
-	DbCustomerInactive = 0
-)
-
 func (d customerRepositoryDb) ByActive(status CustomerStatus) ([]Customer, *errs.AppError) {
 	byActiveSql := "select customer_id, name, city, zipcode, date_of_birth, status from customers where status = ?"
-	var byActiveQueryParam uint
 
 	if ok := status.IsValid(); !ok {
 		logger.Error("invalid customer status enum value: ", zap.Uint("customer_status", uint(status)))
@@ -30,14 +24,7 @@ func (d customerRepositoryDb) ByActive(status CustomerStatus) ([]Customer, *errs
 
 	customers := make([]Customer, 0)
 
-	switch status {
-	case CustomerStatusActive:
-		byActiveQueryParam = DbCustomerActive
-	case CustomerStatusInactive:
-		byActiveQueryParam = DbCustomerInactive
-	}
-
-	err := d.client.Select(&customers, byActiveSql, byActiveQueryParam)
+	err := d.client.Select(&customers, byActiveSql, status)
 
 	if err != nil {
 		logger.Error("Error while querying customer table " + err.Error())

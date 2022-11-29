@@ -26,3 +26,4 @@ func readRequest(r *http.Request, dto any) *errs.AppError {
 	}
 	return nil
 }
+

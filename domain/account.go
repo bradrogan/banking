@@ -6,8 +6,8 @@ import (
 )
 
 type Account struct {
-	Id          string `db:"account_id"`
-	Type        string `db:"account_type"`
+	Id          string      `db:"account_id"`
+	Type        AccountType `db:"account_type"`
 	Amount      float64
 	CustomerId  string `db:"customer_id"`
 	OpeningDate string `db:"opening_date"`
@@ -17,9 +17,16 @@ type Account struct {
 type AccountStatus uint
 
 const (
-	AccountStatusInactive AccountStatus = iota
-	AccountStatusActive
+	AccountInactive AccountStatus = iota
+	AccountActive
 	endAccountStatus
+)
+
+type AccountType string
+
+const (
+	Checking AccountType = "checking"
+	Saving   AccountType = "saving"
 )
 
 type AccountRepository interface {
@@ -32,9 +39,9 @@ func (status AccountStatus) IsValid() bool {
 
 func (status AccountStatus) StatusAsText() string {
 	switch status {
-	case AccountStatusInactive:
+	case AccountInactive:
 		return "inactive"
-	case AccountStatusActive:
+	case AccountActive:
 		return "active"
 	default:
 		return ""

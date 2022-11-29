@@ -6,6 +6,7 @@ import (
 	"github.com/bradrogan/banking/domain"
 	"github.com/bradrogan/banking/dto"
 	"github.com/bradrogan/banking/errs"
+	"github.com/bradrogan/banking/logger"
 )
 
 type AccountService struct {
@@ -13,13 +14,17 @@ type AccountService struct {
 }
 
 func (s AccountService) NewAccount(req dto.NewAccountRequest) (*dto.NewAccountResponse, *errs.AppError) {
+	if err := req.Validate(); err != nil {
+		logger.Error("validaton failed")
+		return nil, err
+	}
 	a := domain.Account{
 		Id:          "",
-		Type:        req.Type,
+		Type:        domain.AccountType(req.Type),
 		Amount:      req.Amount,
 		CustomerId:  req.CustomerId,
 		OpeningDate: time.Now().Format("2006-01-02 15:04:05"),
-		Status:      domain.AccountStatusActive,
+		Status:      domain.AccountActive,
 	}
 
 	newAccount, err := s.repo.Save(a)

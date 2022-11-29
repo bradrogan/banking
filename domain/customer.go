@@ -14,11 +14,12 @@ type Customer struct {
 	Status      CustomerStatus
 }
 
+//go:generate stringer -type=CustomerStatus
 type CustomerStatus uint
 
 const (
-	CustomerStatusInactive CustomerStatus = iota
-	CustomerStatusActive
+	CustomerInactive CustomerStatus = iota
+	CustomerActive
 	endCustomerStatus
 )
 
@@ -28,9 +29,9 @@ func (cs CustomerStatus) IsValid() bool {
 
 func (status CustomerStatus) StatusAsText() string {
 	switch status {
-	case CustomerStatusInactive:
+	case CustomerInactive:
 		return "inactive"
-	case CustomerStatusActive:
+	case CustomerActive:
 		return "active"
 	default:
 		return ""
@@ -48,9 +49,9 @@ func (c Customer) ToDto() dto.CustomerResponse {
 	var statusText string
 
 	switch c.Status {
-	case DbCustomerActive:
+	case CustomerActive:
 		statusText = "active"
-	case DbCustomerInactive:
+	case CustomerInactive:
 		statusText = "inactive"
 	}
 
