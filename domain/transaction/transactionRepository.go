@@ -1,4 +1,4 @@
-package domain
+package transaction
 
 import (
 	"strconv"
@@ -33,7 +33,7 @@ func (db transactionRepositoryDb) Save(t Transaction) (*Transaction, *errs.AppEr
 	return &t, nil
 }
 
-func NewTransactionRepository(db *sqlx.DB) *transactionRepositoryDb {
+func NewDbRepository(db *sqlx.DB) *transactionRepositoryDb {
 	return &transactionRepositoryDb{
 		client: db,
 	}

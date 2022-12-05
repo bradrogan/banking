@@ -1,8 +1,7 @@
-package domain
+package customer
 
 import (
 	"github.com/bradrogan/banking/dto"
-	"github.com/bradrogan/banking/errs"
 )
 
 type Customer struct {
@@ -11,37 +10,31 @@ type Customer struct {
 	City        string
 	Zipcode     string
 	DateOfBirth string `db:"date_of_birth"`
-	Status      CustomerStatus
+	Status      Status
 }
 
-//go:generate stringer -type=CustomerStatus
-type CustomerStatus uint
+//go:generate stringer -type=Status
+type Status uint
 
 const (
-	CustomerInactive CustomerStatus = iota
-	CustomerActive
-	endCustomerStatus
+	Inactive Status = iota
+	Active
+	end
 )
 
-func (cs CustomerStatus) IsValid() bool {
-	return cs < endCustomerStatus
+func (cs Status) IsValid() bool {
+	return cs < end
 }
 
-func (status CustomerStatus) StatusAsText() string {
+func (status Status) StatusAsText() string {
 	switch status {
-	case CustomerInactive:
+	case Inactive:
 		return "inactive"
-	case CustomerActive:
+	case Active:
 		return "active"
 	default:
 		return ""
 	}
-}
-
-type CustomerRepository interface {
-	FindAll() ([]Customer, *errs.AppError)
-	ById(string) (*Customer, *errs.AppError)
-	ByActive(CustomerStatus) ([]Customer, *errs.AppError)
 }
 
 func (c Customer) ToDto() dto.CustomerResponse {
@@ -49,9 +42,9 @@ func (c Customer) ToDto() dto.CustomerResponse {
 	var statusText string
 
 	switch c.Status {
-	case CustomerActive:
+	case Active:
 		statusText = "active"
-	case CustomerInactive:
+	case Inactive:
 		statusText = "inactive"
 	}
 

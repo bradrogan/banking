@@ -8,12 +8,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type AccountServicer interface {
+type accountCreater interface {
 	NewAccount(req dto.NewAccountRequest) (*dto.NewAccountResponse, *errs.AppError)
 }
 
 type AccountHandlers struct {
-	service AccountServicer
+	newAccounter accountCreater
 }
 
 func (ah *AccountHandlers) NewAccount(w http.ResponseWriter, r *http.Request) {
@@ -30,11 +30,17 @@ func (ah *AccountHandlers) NewAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := ah.service.NewAccount(request)
+	response, err := ah.newAccounter.NewAccount(request)
 	if err != nil {
 		writeResponse(w, err.Code, err.AsMessage())
 		return
 	}
 
 	writeResponse(w, http.StatusCreated, response)
+}
+
+func NewAccountHandler(a accountCreater) *AccountHandlers {
+	return &AccountHandlers{
+		newAccounter: a,
+	}
 }

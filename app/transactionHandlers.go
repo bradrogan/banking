@@ -12,11 +12,11 @@ type transactionSaver interface {
 	SaveTransaction(dto.NewTransactionRequst) (*dto.NewTransactionResponse, *errs.AppError)
 }
 
-type TransactionHandler struct {
+type TransactionHandlers struct {
 	transactionSaver transactionSaver
 }
 
-func (th *TransactionHandler) NewTransaction(w http.ResponseWriter, r *http.Request) {
+func (th *TransactionHandlers) NewTransaction(w http.ResponseWriter, r *http.Request) {
 	var request dto.NewTransactionRequst
 
 	vars := mux.Vars(r)
@@ -41,8 +41,8 @@ func (th *TransactionHandler) NewTransaction(w http.ResponseWriter, r *http.Requ
 	writeResponse(w, http.StatusCreated, response)
 }
 
-func NewTransactionHandler(t transactionSaver) *TransactionHandler {
-	return &TransactionHandler{
+func NewTransactionHandler(t transactionSaver) *TransactionHandlers {
+	return &TransactionHandlers{
 		transactionSaver: t,
 	}
 }

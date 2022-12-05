@@ -6,8 +6,12 @@ import (
 
 	"github.com/bradrogan/banking/config"
 	"github.com/bradrogan/banking/connections"
-	"github.com/bradrogan/banking/domain"
-	"github.com/bradrogan/banking/service"
+	"github.com/bradrogan/banking/domain/account"
+	"github.com/bradrogan/banking/domain/customer"
+	"github.com/bradrogan/banking/domain/transaction"
+	"github.com/bradrogan/banking/service/accountsvc"
+	"github.com/bradrogan/banking/service/customersvc"
+	"github.com/bradrogan/banking/service/transactionsvc"
 	"github.com/gorilla/mux"
 )
 
@@ -17,12 +21,15 @@ func Start() {
 
 	db := connections.NewDbClient()
 
-	ch := CustomerHandlers{service.NewCustomerService(domain.NewCustomerRepositoryDb(db))}
-	ah := AccountHandlers{service.NewAccountService(domain.NewAccountRepositoryDb(db))}
+	ch := CustomerHandlers{customersvc.New(customer.NewCustomerRepositoryDb(db))}
+
+	ah := NewAccountHandler(
+		accountsvc.New(
+			account.NewDbRepository(db)))
 
 	th := NewTransactionHandler(
-		service.NewTransactionService(
-			domain.NewTransactionRepository(db)))
+		transactionsvc.New(
+			transaction.NewDbRepository(db), account.NewDbRepository(db)))
 
 	router.HandleFunc("/customers", ch.getCustomersByStatus).Queries("status", "{status:[0-9a-zA-Z_]*}").Methods(http.MethodGet)
 	router.HandleFunc("/customers", ch.getAllCustomers).Methods(http.MethodGet)

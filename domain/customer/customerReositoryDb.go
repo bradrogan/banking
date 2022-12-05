@@ -1,4 +1,4 @@
-package domain
+package customer
 
 import (
 	"database/sql"
@@ -14,7 +14,7 @@ type customerRepositoryDb struct {
 	client *sqlx.DB
 }
 
-func (d customerRepositoryDb) ByActive(status CustomerStatus) ([]Customer, *errs.AppError) {
+func (d customerRepositoryDb) ByActive(status Status) ([]Customer, *errs.AppError) {
 	byActiveSql := "select customer_id, name, city, zipcode, date_of_birth, status from customers where status = ?"
 
 	if ok := status.IsValid(); !ok {
@@ -55,10 +55,10 @@ func (d customerRepositoryDb) ById(id string) (*Customer, *errs.AppError) {
 	var c Customer
 	err := d.client.Get(&c, customerSql, id)
 
+	if err == sql.ErrNoRows {
+		return nil, errs.NewNotFoundError("Customer not found")
+	}
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errs.NewNotFoundError("Customer not found")
-		}
 		logger.Error("Error while scanning customer table " + err.Error())
 		return nil, errs.NewUnexpectedError("unexpected database error" + err.Error())
 	}
