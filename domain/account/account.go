@@ -1,8 +1,6 @@
 package account
 
-import (
-	"github.com/bradrogan/banking/dto"
-)
+import "github.com/bradrogan/banking/dto"
 
 type Account struct {
 	Id          string `db:"account_id"`
@@ -49,10 +47,6 @@ func (a Account) ToNewAccountDto() dto.NewAccountResponse {
 	}
 }
 
-func (a Account) ToAccountDto() dto.AccountResponse {
-	return dto.AccountResponse{
-		CustomerId: a.CustomerId,
-		Amount:     a.Amount,
-		Status:     a.Status.StatusAsText(),
-	}
+func (a Account) CanWithdraw(amount float64) bool {
+	return amount <= a.Amount
 }

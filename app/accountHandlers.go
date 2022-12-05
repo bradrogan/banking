@@ -8,12 +8,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type accountCreater interface {
+type accountServicer interface {
 	NewAccount(req dto.NewAccountRequest) (*dto.NewAccountResponse, *errs.AppError)
+	SaveTransaction(dto.NewTransactionRequst) (*dto.NewTransactionResponse, *errs.AppError)
 }
 
 type AccountHandlers struct {
-	newAccounter accountCreater
+	service accountServicer
 }
 
 func (ah *AccountHandlers) NewAccount(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +31,7 @@ func (ah *AccountHandlers) NewAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := ah.newAccounter.NewAccount(request)
+	response, err := ah.service.NewAccount(request)
 	if err != nil {
 		writeResponse(w, err.Code, err.AsMessage())
 		return
@@ -39,8 +40,33 @@ func (ah *AccountHandlers) NewAccount(w http.ResponseWriter, r *http.Request) {
 	writeResponse(w, http.StatusCreated, response)
 }
 
-func NewAccountHandler(a accountCreater) *AccountHandlers {
+func (ah *AccountHandlers) NewTransaction(w http.ResponseWriter, r *http.Request) {
+	var request dto.NewTransactionRequst
+
+	vars := mux.Vars(r)
+	customer := vars["customer_id"]
+	account := vars["account_id"]
+
+	request.CustomerId = customer
+	request.AccountId = account
+
+	err := readRequest(r, &request)
+	if err != nil {
+		writeResponse(w, err.Code, err.AsMessage())
+		return
+	}
+
+	response, err := ah.service.SaveTransaction(request)
+	if err != nil {
+		writeResponse(w, err.Code, err.AsMessage())
+		return
+	}
+
+	writeResponse(w, http.StatusCreated, response)
+}
+
+func NewAccountHandler(a accountServicer) *AccountHandlers {
 	return &AccountHandlers{
-		newAccounter: a,
+		service: a,
 	}
 }

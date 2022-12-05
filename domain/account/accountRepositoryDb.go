@@ -36,31 +36,70 @@ func (d accountRepositoryDb) Save(a Account) (*Account, *errs.AppError) {
 }
 
 func (d accountRepositoryDb) UpdateBalance(a Account) (*Account, *errs.AppError) {
-	updateBalanceSql := "update accounts set amount = ? where account_id = ?"
 
-	res, err := d.client.Exec(updateBalanceSql, a.Amount, a.Id)
+	return &a, nil
+}
+
+func (db accountRepositoryDb) SaveTransaction(t Transaction) (*Transaction, *errs.AppError) {
+	tx, err := db.client.Begin()
 	if err != nil {
+		logger.Error("error starting db transaction for account transaction " + err.Error())
+		return nil, errs.NewUnexpectedError("unexpected database error")
+	}
+
+	amount := t.Amount
+
+	if t.Type == Withdrawal {
+		amount *= -1
+	}
+
+	updateBalanceSql := "update accounts set amount = amount + ? where account_id = ?"
+
+	res, err := tx.Exec(updateBalanceSql, amount, t.AccountId)
+	if err != nil {
+		tx.Rollback()
 		logger.Error("error updating balance", zap.Error(err))
 		return nil, errs.NewUnexpectedError("unexpected database error")
 	}
 
 	rows, err := res.RowsAffected()
 	if err != nil || rows != 1 {
-		logger.Error("error getting rows affected", zap.Error(err))
+		tx.Rollback()
+		logger.Error("unexpected rows affected", zap.Error(err))
 		return nil, errs.NewUnexpectedError("unexpected database error")
 	}
 
-	return &a, nil
+	saveSql := "insert into transactions (account_id, amount, transaction_date, transaction_type) values (?, ?, ?, ?)"
+
+	tRes, err := tx.Exec(saveSql, t.AccountId, t.Amount, t.Time, t.Type)
+	if err != nil {
+		tx.Rollback()
+		logger.Error("error completing transaction", zap.Error(err))
+		return nil, errs.NewUnexpectedError("unexpected database error")
+	}
+
+	id, err := tRes.LastInsertId()
+	if err != nil {
+		tx.Rollback()
+		logger.Error("error getting last inserted transaction", zap.Error(err))
+		return nil, errs.NewUnexpectedError("unexpected database error")
+	}
+
+	tx.Commit()
+
+	t.Id = strconv.FormatInt(id, 10)
+
+	return &t, nil
 }
 
-func (d accountRepositoryDb) GetAccount(id string) (*Account, *errs.AppError) {
-	getSql := "select account_id, customer_id, amount, status from accounts where account_id = ?"
+func (d accountRepositoryDb) GetAccount(accountId string, customerId string) (*Account, *errs.AppError) {
+	getSql := "select account_id, customer_id, amount, status from accounts where account_id = ? and customer_id = ?"
 
 	var a Account
-	err := d.client.Get(&a, getSql, id)
+	err := d.client.Get(&a, getSql, accountId, customerId)
 
 	if err == sql.ErrNoRows {
-		return nil, errs.NewNotFoundError("account not found")
+		return nil, errs.NewNotFoundError("account not found for customer")
 	}
 	if err != nil {
 		logger.Error("error while scanning account table", zap.Error(err))

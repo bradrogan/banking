@@ -11,7 +11,8 @@ import (
 
 type accountData interface {
 	Save(account.Account) (*account.Account, *errs.AppError)
-	GetAccount(string) (*account.Account, *errs.AppError)
+	GetAccount(string, string) (*account.Account, *errs.AppError)
+	SaveTransaction(account.Transaction) (*account.Transaction, *errs.AppError)
 }
 
 type AccountService struct {
@@ -42,12 +43,43 @@ func (s AccountService) NewAccount(req dto.NewAccountRequest) (*dto.NewAccountRe
 	return &response, nil
 
 }
-func (s AccountService) GetAccount(id string) (*dto.AccountResponse, *errs.AppError) {
-	a, err := s.data.GetAccount(id)
+
+func (s AccountService) SaveTransaction(req dto.NewTransactionRequst) (*dto.NewTransactionResponse, *errs.AppError) {
+	if err := req.Validate(); err != nil {
+		logger.Error("transaction validation failed")
+		return nil, err
+	}
+
+	a, err := s.data.GetAccount(req.AccountId, req.CustomerId)
 	if err != nil {
 		return nil, err
 	}
-	response := a.ToAccountDto()
+
+	if req.IsWithdrawal() && !a.CanWithdraw(req.Amount) {
+		return nil, errs.NewValidationError("withdrawal amount exceeds limit")
+	}
+
+	t := account.Transaction{
+		AccountId: req.AccountId,
+		Type:      account.TransactionType(req.Type),
+		Amount:    req.Amount,
+		Time:      time.Now().Format("2006-01-02 15:04:05"),
+	}
+
+	newTransaction, err := s.data.SaveTransaction(t)
+	if err != nil {
+		return nil, err
+	}
+
+	a, _ = s.data.GetAccount(req.AccountId, req.CustomerId)
+
+	response := dto.NewTransactionResponse{
+		TransactionId:   newTransaction.Id,
+		TransactionType: string(newTransaction.Type),
+		AccountId:       newTransaction.AccountId,
+		Balance:         a.Amount,
+		TransactionDate: newTransaction.Time,
+	}
 
 	return &response, nil
 }
