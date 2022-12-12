@@ -22,7 +22,7 @@ func (t NewTransactionRequst) Validate() *errs.AppError {
 		return errs.NewValidationError("invalid transaction type")
 	}
 
-	if t.Amount <= 0 {
+	if t.Amount < 0 {
 		return errs.NewValidationError("amount cannot be negative")
 	}
 

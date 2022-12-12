@@ -13,9 +13,9 @@ func _() {
 	_ = x[end-2]
 }
 
-const _Status_name = "CustomerInactiveCustomerActiveendCustomerStatus"
+const _Status_name = "InactiveActiveend"
 
-var _Status_index = [...]uint8{0, 16, 30, 47}
+var _Status_index = [...]uint8{0, 8, 14, 17}
 
 func (i Status) String() string {
 	if i >= Status(len(_Status_index)-1) {
