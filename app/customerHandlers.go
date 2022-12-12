@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//go:generate mockgen -destination=../mocks/app/mockCustomerServicer.go -package=app github.com/bradrogan/banking/app CustomerServicer
+//go:generate mockgen -destination=../mock/mockCustomerServicer.go -package=mock github.com/bradrogan/banking/app CustomerServicer
 type CustomerServicer interface {
 	GetAllCustomers() ([]dto.CustomerResponse, *errs.AppError)
 	GetCustomersByStatus(customer.Status) ([]dto.CustomerResponse, *errs.AppError)
