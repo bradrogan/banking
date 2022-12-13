@@ -40,7 +40,8 @@ func (ch *CustomerHandlers) getCustomersByStatus(w http.ResponseWriter, r *http.
 	case customer.Inactive.StatusAsText():
 		status = customer.Inactive
 	default:
-		writeResponse(w, http.StatusBadRequest, "invalid value for 'status' query parameter")
+		err := errs.NewBadRequestError("invalid value for 'status' query parameter")
+		writeResponse(w, err.Code, err.AsMessage())
 		return
 	}
 
