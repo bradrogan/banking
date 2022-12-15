@@ -6,6 +6,7 @@ import (
 	"github.com/bradrogan/banking/errs"
 )
 
+//go:generate mockgen -destination=../../mock/mockCustomerData.go -package=mock -source=./customerSvc.go customerData
 type customerData interface {
 	FindAll() ([]customer.Customer, *errs.AppError)
 	ById(string) (*customer.Customer, *errs.AppError)
