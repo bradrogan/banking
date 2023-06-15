@@ -111,3 +111,18 @@ func (d accountRepositoryDb) GetAccount(accountId string, customerId string) (*A
 func NewDbRepository(db *sqlx.DB) accountRepositoryDb {
 	return accountRepositoryDb{client: db}
 }
+
+// get all accounts for a customer
+func (d accountRepositoryDb) GetAccounts(customerId string) ([]Account, *errs.AppError) {
+	var accounts []Account
+
+	sql := "select account_id, customer_id, account_type, amount, status from accounts where customer_id = ?"
+
+	err := d.client.Select(&accounts, sql, customerId)
+	if err != nil {
+		logger.Error("error while scanning account table", zap.Error(err))
+		return nil, errs.NewUnexpectedError("unexpected database errror" + err.Error())
+	}
+
+	return accounts, nil
+}

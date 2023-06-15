@@ -33,6 +33,9 @@ func Start() {
 
 	router.HandleFunc("/customers/{customer_id:[0-9]*}/account/{account_id:[0-9]*}", ah.NewTransaction).Methods(http.MethodPost)
 
+	// get all accounts for a customer
+	router.HandleFunc("/customers/{customer_id:[0-9]*}/account", ah.GetAccounts).Methods(http.MethodGet)
+
 	addr := config.App.Server.Host + ":" + config.App.Server.Port
 	log.Fatal(http.ListenAndServe(addr, router))
 }

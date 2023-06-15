@@ -11,6 +11,7 @@ import (
 type accountServicer interface {
 	NewAccount(req dto.NewAccountRequest) (*dto.NewAccountResponse, *errs.AppError)
 	SaveTransaction(dto.NewTransactionRequst) (*dto.NewTransactionResponse, *errs.AppError)
+	GetAccounts(string) ([]dto.AccountResponse, *errs.AppError)
 }
 
 type AccountHandlers struct {
@@ -69,4 +70,17 @@ func NewAccountHandler(a accountServicer) *AccountHandlers {
 	return &AccountHandlers{
 		service: a,
 	}
+}
+
+func (ah *AccountHandlers) GetAccounts(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	customerId := vars["customer_id"]
+
+	accounts, err := ah.service.GetAccounts(customerId)
+	if err != nil {
+		writeResponse(w, err.Code, err.AsMessage())
+		return
+	}
+
+	writeResponse(w, http.StatusOK, accounts)
 }

@@ -13,6 +13,7 @@ type accountData interface {
 	Save(account.Account) (*account.Account, *errs.AppError)
 	GetAccount(string, string) (*account.Account, *errs.AppError)
 	SaveTransaction(account.Transaction) (*account.Transaction, *errs.AppError)
+	GetAccounts(string) ([]account.Account, *errs.AppError)
 }
 
 type AccountService struct {
@@ -88,4 +89,18 @@ func New(a accountData) *AccountService {
 	return &AccountService{
 		data: a,
 	}
+}
+
+func (s AccountService) GetAccounts(customerId string) ([]dto.AccountResponse, *errs.AppError) {
+	accounts, err := s.data.GetAccounts(customerId)
+	if err != nil {
+		return nil, err
+	}
+
+	response := make([]dto.AccountResponse, 0)
+	for _, a := range accounts {
+		response = append(response, a.ToAccountResponseDto())
+	}
+
+	return response, nil
 }

@@ -50,3 +50,18 @@ func (a Account) ToNewAccountDto() dto.NewAccountResponse {
 func (a Account) CanWithdraw(amount float64) bool {
 	return amount <= a.Amount
 }
+
+func (a Account) ToAccountResponseDto() dto.AccountResponse {
+	return dto.AccountResponse{
+		AccountId:   a.Id,
+		CustomerId:  a.CustomerId,
+		OpeningDate: a.OpeningDate,
+		AccountType: a.Type.String(),
+		Amount:      a.Amount,
+		Status:      a.Status.StatusAsText(),
+	}
+}
+
+func (t Type) String() string {
+	return string(t)
+}
