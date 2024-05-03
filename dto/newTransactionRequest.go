@@ -5,7 +5,7 @@ import (
 	"github.com/bradrogan/banking/helpers"
 )
 
-type NewTransactionRequst struct {
+type NewTransactionRequest struct {
 	CustomerId string  `json:"customer_id,omitempty" xml:"customer_id"`
 	AccountId  string  `json:"account_id,omitempty" xml:"account_id"`
 	Type       string  `json:"transaction_type,omitempty" xml:"type"`
@@ -17,7 +17,7 @@ var transactionTypes = [...]string{
 	"withdrawal",
 }
 
-func (t NewTransactionRequst) Validate() *errs.AppError {
+func (t NewTransactionRequest) Validate() *errs.AppError {
 	if !helpers.Contains(t.Type, transactionTypes[:]) {
 		return errs.NewValidationError("invalid transaction type")
 	}
@@ -29,6 +29,6 @@ func (t NewTransactionRequst) Validate() *errs.AppError {
 	return nil
 }
 
-func (t NewTransactionRequst) IsWithdrawal() bool {
+func (t NewTransactionRequest) IsWithdrawal() bool {
 	return t.Type == "withdrawal"
 }

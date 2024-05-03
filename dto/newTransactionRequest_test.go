@@ -11,12 +11,12 @@ import (
 func TestNewTransactionRequst_Validate(t *testing.T) {
 	tests := []struct {
 		name string
-		tr   NewTransactionRequst
+		tr   NewTransactionRequest
 		want *errs.AppError
 	}{
 		{
 			name: "Test 'deposit' Transaction Type",
-			tr: NewTransactionRequst{
+			tr: NewTransactionRequest{
 				CustomerId: "1",
 				AccountId:  "1",
 				Type:       "deposit",
@@ -26,7 +26,7 @@ func TestNewTransactionRequst_Validate(t *testing.T) {
 		},
 		{
 			name: "Test 'withdrawal' Transaction Type",
-			tr: NewTransactionRequst{
+			tr: NewTransactionRequest{
 				CustomerId: "1",
 				AccountId:  "1",
 				Type:       "withdrawal",
@@ -36,7 +36,7 @@ func TestNewTransactionRequst_Validate(t *testing.T) {
 		},
 		{
 			name: "Test Invalid Transaction Type",
-			tr: NewTransactionRequst{
+			tr: NewTransactionRequest{
 				CustomerId: "1",
 				AccountId:  "1",
 				Type:       "",
@@ -49,7 +49,7 @@ func TestNewTransactionRequst_Validate(t *testing.T) {
 		},
 		{
 			name: "Test Negative Amount",
-			tr: NewTransactionRequst{
+			tr: NewTransactionRequest{
 				CustomerId: "1",
 				AccountId:  "1",
 				Type:       "withdrawal",
@@ -62,7 +62,7 @@ func TestNewTransactionRequst_Validate(t *testing.T) {
 		},
 		{
 			name: "Test Zero Amount",
-			tr: NewTransactionRequst{
+			tr: NewTransactionRequest{
 				CustomerId: "1",
 				AccountId:  "1",
 				Type:       "withdrawal",
@@ -83,12 +83,12 @@ func TestNewTransactionRequst_Validate(t *testing.T) {
 func TestNewTransactionRequst_IsWithdrawal(t *testing.T) {
 	tests := []struct {
 		name string
-		tr   NewTransactionRequst
+		tr   NewTransactionRequest
 		want bool
 	}{
 		{
 			name: "Test is withdrawal",
-			tr: NewTransactionRequst{
+			tr: NewTransactionRequest{
 				CustomerId: "",
 				AccountId:  "",
 				Type:       "withdrawal",
