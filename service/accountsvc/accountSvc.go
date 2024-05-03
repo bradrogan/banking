@@ -44,7 +44,7 @@ func (s AccountService) NewAccount(req dto.NewAccountRequest) (*dto.NewAccountRe
 
 }
 
-func (s AccountService) SaveTransaction(req dto.NewTransactionRequst) (*dto.NewTransactionResponse, *errs.AppError) {
+func (s AccountService) SaveTransaction(req dto.NewTransactionRequest) (*dto.NewTransactionResponse, *errs.AppError) {
 	if err := req.Validate(); err != nil {
 		logger.Error("transaction validation failed")
 		return nil, err

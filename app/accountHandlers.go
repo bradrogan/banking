@@ -10,7 +10,7 @@ import (
 
 type accountServicer interface {
 	NewAccount(req dto.NewAccountRequest) (*dto.NewAccountResponse, *errs.AppError)
-	SaveTransaction(dto.NewTransactionRequst) (*dto.NewTransactionResponse, *errs.AppError)
+	SaveTransaction(dto.NewTransactionRequest) (*dto.NewTransactionResponse, *errs.AppError)
 }
 
 type AccountHandlers struct {
@@ -41,7 +41,7 @@ func (ah *AccountHandlers) NewAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ah *AccountHandlers) NewTransaction(w http.ResponseWriter, r *http.Request) {
-	var request dto.NewTransactionRequst
+	var request dto.NewTransactionRequest
 
 	vars := mux.Vars(r)
 	customer := vars["customer_id"]
